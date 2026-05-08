@@ -21,7 +21,7 @@ service cloud.firestore {
           && (
             !request.resource.data.keys().hasAny(['entries']) ||
             (
-              request.resource.data.entries.size() >= 5 &&
+              request.resource.data.entries.size() >= 1 &&
               request.resource.data.entries.size() <= 50
             )
           )
