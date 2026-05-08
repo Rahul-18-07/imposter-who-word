@@ -73,9 +73,6 @@ export function GameOverScreen({ state, onPlayAgain, onHome }: Props) {
             <div className="rounded-xl p-3 text-center" style={{ background: S.surface }}>
               <p style={{ color: S.fade, fontFamily: S.mono, fontSize: '9px', letterSpacing: '0.10em', marginBottom: '4px' }}>SECRET WORD</p>
               <p style={{ color: S.ink, fontFamily: S.anton, fontSize: '22px', letterSpacing: '0.03em' }}>{state.secretWord}</p>
-              {state.secretHint && (
-                <p style={{ color: S.lemon, fontFamily: S.mono, fontSize: '10px', marginTop: '2px' }}>HINT: {state.secretHint}</p>
-              )}
             </div>
             <div className="rounded-xl p-3 text-center" style={{ background: S.surface }}>
               <p style={{ color: S.fade, fontFamily: S.mono, fontSize: '9px', letterSpacing: '0.10em', marginBottom: '4px' }}>CATEGORY</p>
