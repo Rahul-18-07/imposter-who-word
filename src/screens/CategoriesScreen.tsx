@@ -173,14 +173,24 @@ export function CategoriesScreen({ user }: Props) {
         )}
 
         {!loading && tab === 'custom' && customList.length === 0 && (
-          <div className="text-center py-12">
-            <Plus size={32} style={{ color: '#5C5848', margin: '0 auto 12px' }} />
-            <p style={{ color: '#A09A88', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
-              NO CUSTOM CATEGORIES YET
-            </p>
-            <p style={{ color: '#5C5848', fontFamily: 'JetBrains Mono, monospace', fontSize: '11px', marginTop: '4px' }}>
-              TAP NEW TO CREATE ONE
-            </p>
+          <div className="text-center py-12 flex flex-col items-center gap-4">
+            <Plus size={32} style={{ color: '#5C5848' }} />
+            <div>
+              <p style={{ color: '#A09A88', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
+                NO CUSTOM CATEGORIES YET
+              </p>
+              <p style={{ color: '#5C5848', fontFamily: 'JetBrains Mono, monospace', fontSize: '11px', marginTop: '4px' }}>
+                CREATE YOUR OWN WORD LIST
+              </p>
+            </div>
+            <button
+              onClick={() => setCreating(true)}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl btn-press"
+              style={{ background: '#F5D547', color: '#14141A', fontFamily: 'Anton, sans-serif', letterSpacing: '0.05em', fontSize: '15px' }}
+            >
+              <Plus size={18} />
+              CREATE CATEGORY
+            </button>
           </div>
         )}
 
