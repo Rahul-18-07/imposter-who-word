@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-bg text-gray-100 min-h-screen;
-    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    @apply bg-bg text-ink min-h-screen;
+    font-family: 'Inter', 'Outfit', system-ui, -apple-system, sans-serif;
   }
 
   * {
@@ -36,5 +36,36 @@
 
   .badge {
     @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* Lemon neon CTA button */
+  .btn-neon {
+    background: #F5D547;
+    color: #14141A;
+    box-shadow: 0 4px 0 #C9AB22, 0 0 24px rgba(245, 213, 71, 0.30), 0 10px 22px rgba(245, 213, 71, 0.20);
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 0.06em;
+  }
+  .btn-neon:hover {
+    box-shadow: 0 4px 0 #C9AB22, 0 0 40px rgba(245, 213, 71, 0.55), 0 12px 28px rgba(245, 213, 71, 0.30);
+  }
+  .btn-neon:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #C9AB22, 0 0 18px rgba(245, 213, 71, 0.25);
+  }
+
+  /* CRT grid overlay */
+  .crt-grid {
+    background-image:
+      linear-gradient(rgba(245, 213, 71, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 213, 71, 0.035) 1px, transparent 1px);
+    background-size: 36px 36px;
+  }
+
+  /* Lemon glow text */
+  .text-lemon-glow {
+    color: #F5D547;
+    text-shadow: 0 0 20px rgba(245, 213, 71, 0.50);
   }
 }

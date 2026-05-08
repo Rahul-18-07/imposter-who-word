@@ -6,11 +6,21 @@ export default {
       fontFamily: {
         sans: ['Outfit', 'system-ui', 'sans-serif'],
       },
+      fontFamily: {
+        anton: ['Anton', 'sans-serif'],
+        bebas: ['"Bebas Neue"', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
       colors: {
-        bg: '#0a0a1a',
-        surface: '#12122a',
-        card: '#141428',
-        border: '#2a2a4a',
+        bg: '#14141A',
+        surface: '#1A1A22',
+        card: '#1E1E28',
+        border: '#2a2a38',
+        lemon: '#F5D547',
+        'lemon-deep': '#C9AB22',
+        ink: '#F5F2E8',
+        'ink-dim': '#A09A88',
+        'ink-fade': '#5C5848',
         'purple-dark': '#5b21b6',
         'purple-mid': '#7c3aed',
         'purple-base': '#9333ea',
@@ -20,7 +30,8 @@ export default {
       backgroundImage: {
         'purple-gradient': 'linear-gradient(135deg, #7c3aed, #a855f7)',
         'card-gradient': 'linear-gradient(135deg, #1e1e40, #141428)',
-        'hero-gradient': 'radial-gradient(ellipse at top, #3b0d6b 0%, #0a0a1a 60%)',
+        'hero-gradient': 'radial-gradient(ellipse at 50% 0%, #1a1a22 0%, #0a0a10 70%)',
+        'lemon-gradient': 'linear-gradient(135deg, #F5D547, #C9AB22)',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',

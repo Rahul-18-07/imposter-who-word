@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import type { Player } from '../game/types';
+import { GripVertical, Plus, X } from 'lucide-react';
 
 interface Props {
   players: Player[];
@@ -8,7 +9,6 @@ interface Props {
 
 export function PlayerListEditor({ players, onChange }: Props) {
   const [newName, setNewName] = useState('');
-  const [pickedFirst, setPickedFirst] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const dragNode = useRef<HTMLDivElement | null>(null);
@@ -18,29 +18,14 @@ export function PlayerListEditor({ players, onChange }: Props) {
     if (!name || players.some((p) => p.name.toLowerCase() === name.toLowerCase())) return;
     onChange([...players, { name, isAlive: true, sessionPoints: 0 }]);
     setNewName('');
-    setPickedFirst(null);
   };
 
-  const removePlayer = (i: number) => {
-    const updated = players.filter((_, idx) => idx !== i);
-    onChange(updated);
-    setPickedFirst(null);
-  };
+  const removePlayer = (i: number) => onChange(players.filter((_, idx) => idx !== i));
 
-  const pickRandom = () => {
-    if (players.length === 0) return;
-    const winner = players[Math.floor(Math.random() * players.length)];
-    setPickedFirst(winner.name);
-  };
-
-  // Drag handlers
   const handleDragStart = (e: React.DragEvent, i: number) => {
     setDragIndex(i);
     e.dataTransfer.effectAllowed = 'move';
-    // small delay so the drag image captures before we style it
-    setTimeout(() => {
-      if (dragNode.current) dragNode.current.style.opacity = '0.4';
-    }, 0);
+    setTimeout(() => { if (dragNode.current) dragNode.current.style.opacity = '0.4'; }, 0);
   };
 
   const handleDragEnter = (i: number) => {
@@ -65,49 +50,34 @@ export function PlayerListEditor({ players, onChange }: Props) {
     <div className="space-y-3">
       <div className="flex gap-2">
         <input
-          placeholder="Player name…"
+          placeholder="Player name"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-          className="flex-1 bg-surface border border-border text-white placeholder-gray-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-light transition-colors"
+          className="flex-1 rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors"
+          style={{
+            background: '#14141A',
+            border: '1px solid rgba(245,213,71,0.15)',
+            color: '#F5F2E8',
+            fontFamily: 'Inter, sans-serif',
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(245,213,71,0.50)')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(245,213,71,0.15)')}
         />
         <button
           onClick={addPlayer}
           disabled={!newName.trim()}
-          className="bg-purple-gradient text-white font-bold px-4 py-3 rounded-xl btn-press disabled:opacity-40 text-sm"
+          className="flex items-center gap-1.5 px-4 py-3 rounded-xl btn-press disabled:opacity-40 text-sm font-bold"
+          style={{ background: '#F5D547', color: '#14141A', boxShadow: '0 3px 0 #C9AB22' }}
         >
-          Add
+          <Plus size={16} />
         </button>
       </div>
 
       {players.length === 0 && (
-        <p className="text-gray-600 text-sm text-center py-2">
-          Add at least 3 players to start
+        <p className="text-sm text-center py-2" style={{ color: '#5C5848', fontFamily: 'JetBrains Mono, monospace' }}>
+          ADD AT LEAST 3 PLAYERS
         </p>
-      )}
-
-      {players.length >= 2 && (
-        <button
-          onClick={pickRandom}
-          className="w-full flex items-center justify-center gap-2 bg-surface border border-border/50 text-purple-pale text-sm font-semibold py-2.5 rounded-xl btn-press hover:border-purple-light/50 transition-colors"
-        >
-          🎲 Pick random first player
-        </button>
-      )}
-
-      {pickedFirst && (
-        <div className="flex items-center gap-2 bg-purple-mid/20 border border-purple-light/30 rounded-xl px-4 py-3 animate-bounce-in">
-          <span className="text-xl">👑</span>
-          <span className="text-purple-pale font-semibold text-sm">
-            <span className="text-white">{pickedFirst}</span> goes first!
-          </span>
-          <button
-            onClick={() => setPickedFirst(null)}
-            className="ml-auto text-gray-500 hover:text-gray-300 text-xs"
-          >
-            ✕
-          </button>
-        </div>
       )}
 
       <div className="space-y-2">
@@ -120,36 +90,44 @@ export function PlayerListEditor({ players, onChange }: Props) {
             onDragEnter={() => handleDragEnter(i)}
             onDragOver={(e) => e.preventDefault()}
             onDragEnd={handleDragEnd}
-            className={`flex items-center justify-between bg-surface border rounded-xl px-3 py-3 transition-all ${
-              dragOverIndex === i && dragIndex !== i
-                ? 'border-purple-light bg-purple-mid/10 scale-[1.02]'
-                : 'border-border/50'
-            }`}
+            className="flex items-center justify-between rounded-xl px-3 py-3 transition-all"
+            style={{
+              background: '#1A1A22',
+              border: dragOverIndex === i && dragIndex !== i
+                ? '1px solid rgba(245,213,71,0.50)'
+                : '1px solid rgba(245,213,71,0.08)',
+            }}
           >
             <div className="flex items-center gap-2.5">
-              {/* drag handle */}
-              <div className="text-gray-600 cursor-grab active:cursor-grabbing px-1 touch-none select-none text-base leading-none">
-                ⠿
+              <div className="cursor-grab active:cursor-grabbing touch-none select-none" style={{ color: '#5C5848' }}>
+                <GripVertical size={16} />
               </div>
-              <div className="w-7 h-7 rounded-full bg-purple-mid/20 flex items-center justify-center text-xs font-bold text-purple-pale">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ background: 'rgba(245,213,71,0.08)', color: '#F5D547', fontFamily: 'JetBrains Mono, monospace' }}
+              >
                 {i + 1}
               </div>
-              <span className="text-white font-medium text-sm">{p.name}</span>
+              <span className="font-medium text-sm" style={{ color: '#F5F2E8', fontFamily: 'Inter, sans-serif' }}>
+                {p.name}
+              </span>
             </div>
             <button
               onClick={() => removePlayer(i)}
-              className="w-7 h-7 rounded-full bg-surface border border-border text-gray-500 hover:text-red-400 hover:border-red-500/50 transition-colors flex items-center justify-center text-xs btn-press"
-              aria-label={`Remove ${p.name}`}
+              className="w-7 h-7 rounded-full flex items-center justify-center transition-colors btn-press"
+              style={{ background: '#14141A', color: '#5C5848' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#5C5848')}
             >
-              ✕
+              <X size={13} />
             </button>
           </div>
         ))}
       </div>
 
       {players.length >= 2 && (
-        <p className="text-gray-600 text-xs text-center">
-          Drag ⠿ to reorder players
+        <p className="text-xs text-center" style={{ color: '#5C5848', fontFamily: 'JetBrains Mono, monospace' }}>
+          DRAG TO REORDER
         </p>
       )}
     </div>

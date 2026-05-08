@@ -6,6 +6,8 @@ import { RoleRevealCard } from '../components/RoleRevealCard';
 import { DiscussionScreen } from '../components/DiscussionScreen';
 import { GameOverScreen } from '../components/GameOverScreen';
 import { recordGame } from '../lib/scoresRepo';
+import { UserX, User as UserIcon, ArrowRight, AlertTriangle } from 'lucide-react';
+import { StartingPlayerPicker } from '../components/StartingPlayerPicker';
 
 interface Props {
   state: GameState;
@@ -13,13 +15,29 @@ interface Props {
   user: User;
 }
 
+const S = {
+  bg: '#14141A',
+  surface: '#1A1A22',
+  card: '#1E1E28',
+  border: 'rgba(245,213,71,0.10)',
+  lemon: '#F5D547',
+  ink: '#F5F2E8',
+  dim: '#A09A88',
+  fade: '#5C5848',
+  mono: 'JetBrains Mono, monospace' as const,
+  anton: 'Anton, sans-serif' as const,
+};
+
 export function GameScreen({ state, dispatch, user }: Props) {
   const navigate = useNavigate();
   const [showExitWarning, setShowExitWarning] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [startingPlayerName] = useState(
+    () => state.players[Math.floor(Math.random() * state.players.length)]?.name ?? '',
+  );
 
   const isActiveGame = state.phase === 'reveal' || state.phase === 'discussion' || state.phase === 'eliminated';
 
-  // Block React Router navigation during active game
   const blocker = useBlocker(isActiveGame);
 
   useEffect(() => {
@@ -28,7 +46,6 @@ export function GameScreen({ state, dispatch, user }: Props) {
     }
   }, [blocker.state]);
 
-  // Block browser back / close during active game
   useEffect(() => {
     if (!isActiveGame) return;
     const handler = (e: BeforeUnloadEvent) => {
@@ -80,8 +97,25 @@ export function GameScreen({ state, dispatch, user }: Props) {
           playerName={player.name}
           role={role}
           isLast={isLast}
-          onDone={() => dispatch({ type: 'NEXT_REVEAL' })}
+          startingPlayerName={isLast ? startingPlayerName : undefined}
+          onDone={() => {
+            if (isLast) {
+              setShowPicker(true);
+            } else {
+              dispatch({ type: 'NEXT_REVEAL' });
+            }
+          }}
         />
+        {showPicker && (
+          <StartingPlayerPicker
+            players={state.players.map((p) => p.name)}
+            winner={startingPlayerName}
+            onDone={() => {
+              setShowPicker(false);
+              dispatch({ type: 'NEXT_REVEAL' });
+            }}
+          />
+        )}
         {showExitWarning && <ExitWarningModal onConfirm={handleConfirmExit} onCancel={handleCancelExit} />}
       </>
     );
@@ -94,22 +128,37 @@ export function GameScreen({ state, dispatch, user }: Props) {
 
     return (
       <>
-        <div className="min-h-dvh bg-bg flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <div className="animate-bounce-in">
-            <div className="text-8xl mb-4">{wasImposter ? '🕵️' : '😇'}</div>
+        <div className="min-h-dvh flex flex-col items-center justify-center p-6 text-center animate-fade-in" style={{ background: S.bg }}>
+          <div className="animate-bounce-in mb-4">
+            <div
+              className="w-28 h-28 rounded-3xl flex items-center justify-center mx-auto"
+              style={wasImposter
+                ? { background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.30)' }
+                : { background: 'rgba(74,222,128,0.08)', border: '1.5px solid rgba(74,222,128,0.25)' }}
+            >
+              {wasImposter
+                ? <UserX size={52} style={{ color: '#f87171' }} />
+                : <UserIcon size={52} style={{ color: '#4ade80' }} />}
+            </div>
           </div>
-          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-3 ${wasImposter ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-            {wasImposter ? '🎯 Imposter found!' : '✅ Innocent civilian'}
+          <div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-3"
+            style={wasImposter
+              ? { background: 'rgba(239,68,68,0.12)', color: '#f87171', fontFamily: S.mono, fontSize: '11px', letterSpacing: '0.06em' }
+              : { background: 'rgba(74,222,128,0.10)', color: '#4ade80', fontFamily: S.mono, fontSize: '11px', letterSpacing: '0.06em' }}
+          >
+            {wasImposter ? 'IMPOSTOR FOUND!' : 'INNOCENT PLAYER'}
           </div>
-          <h2 className="text-4xl font-extrabold text-white mb-2">{player.name}</h2>
-          <p className="text-gray-400 text-lg mb-8">
-            {wasImposter ? 'was hiding among you!' : 'was just a civilian.'}
+          <h2 style={{ fontFamily: S.anton, color: S.ink, fontSize: '40px', letterSpacing: '0.04em', marginBottom: '8px' }}>{player.name}</h2>
+          <p style={{ color: S.dim, fontFamily: 'Inter, sans-serif', fontSize: '17px', marginBottom: '40px' }}>
+            {wasImposter ? 'was hiding among you!' : 'was not the impostor.'}
           </p>
           <button
             onClick={() => dispatch({ type: 'ACK_ELIMINATION' })}
-            className="bg-purple-gradient text-white font-bold py-4 px-10 rounded-2xl btn-press shadow-lg shadow-purple-mid/30 text-base"
+            className="py-4 px-10 rounded-2xl btn-press flex items-center gap-2"
+            style={{ background: S.lemon, color: '#14141A', boxShadow: '0 4px 0 #C9AB22', fontFamily: S.anton, letterSpacing: '0.06em', fontSize: '18px' }}
           >
-            Continue →
+            CONTINUE <ArrowRight size={18} />
           </button>
         </div>
         {showExitWarning && <ExitWarningModal onConfirm={handleConfirmExit} onCancel={handleCancelExit} />}
@@ -122,6 +171,7 @@ export function GameScreen({ state, dispatch, user }: Props) {
       <>
         <DiscussionScreen
           state={state}
+          startingPlayerName={startingPlayerName}
           onEliminate={(idx) => dispatch({ type: 'MARK_ELIMINATED', playerIndex: idx })}
         />
         {showExitWarning && <ExitWarningModal onConfirm={handleConfirmExit} onCancel={handleCancelExit} />}
@@ -143,28 +193,47 @@ export function GameScreen({ state, dispatch, user }: Props) {
 }
 
 function ExitWarningModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  const S = {
+    bg: '#14141A',
+    surface: '#1A1A22',
+    card: '#1E1E28',
+    border: 'rgba(245,213,71,0.10)',
+    ink: '#F5F2E8',
+    dim: '#A09A88',
+    fade: '#5C5848',
+    mono: 'JetBrains Mono, monospace' as const,
+    anton: 'Anton, sans-serif' as const,
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onCancel} />
-      <div className="relative bg-card border border-border rounded-t-3xl w-full max-w-lg p-6 pb-8 shadow-2xl animate-slide-up safe-bottom">
-        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
+      <div
+        className="relative w-full max-w-lg p-6 pb-8 shadow-2xl animate-slide-up safe-bottom"
+        style={{ background: S.card, border: `1px solid ${S.border}`, borderBottom: 'none', borderRadius: '24px 24px 0 0' }}
+      >
+        <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: S.fade }} />
         <div className="text-center mb-6">
-          <div className="text-5xl mb-3">⚠️</div>
-          <h2 className="text-xl font-bold text-white mb-2">End the game?</h2>
-          <p className="text-gray-400 text-sm">The game is still in progress. All progress will be lost.</p>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(245,213,71,0.08)', border: '1px solid rgba(245,213,71,0.20)' }}>
+            <AlertTriangle size={28} style={{ color: '#F5D547' }} />
+          </div>
+          <h2 style={{ fontFamily: S.anton, color: S.ink, fontSize: '22px', letterSpacing: '0.05em', marginBottom: '8px' }}>END THE GAME?</h2>
+          <p style={{ color: S.dim, fontFamily: S.mono, fontSize: '11px', letterSpacing: '0.04em' }}>THE GAME IS STILL IN PROGRESS. ALL PROGRESS WILL BE LOST.</p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 bg-surface border border-border text-white font-semibold py-3.5 rounded-2xl btn-press"
+            className="flex-1 py-3.5 rounded-2xl btn-press"
+            style={{ background: S.surface, border: `1px solid ${S.border}`, color: S.ink, fontFamily: S.mono, fontSize: '12px', letterSpacing: '0.05em' }}
           >
-            Keep Playing
+            KEEP PLAYING
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-2xl btn-press"
+            className="flex-1 py-3.5 rounded-2xl btn-press"
+            style={{ background: '#ef4444', color: '#fff', boxShadow: '0 3px 0 #b91c1c', fontFamily: S.anton, letterSpacing: '0.06em', fontSize: '16px' }}
           >
-            End Game
+            END GAME
           </button>
         </div>
       </div>

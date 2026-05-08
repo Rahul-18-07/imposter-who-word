@@ -6,11 +6,11 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-const variants = {
-  primary: 'bg-purple-gradient text-white shadow-lg shadow-purple-mid/20',
-  secondary: 'bg-surface border border-border text-white hover:border-purple-light/50',
-  ghost: 'text-gray-400 hover:text-white bg-transparent',
-  danger: 'bg-red-600 hover:bg-red-700 text-white',
+const variants: Record<string, React.CSSProperties> = {
+  primary: { background: '#F5D547', color: '#14141A', boxShadow: '0 3px 0 #C9AB22' },
+  secondary: { background: '#1A1A22', color: '#F5F2E8', border: '1px solid rgba(245,213,71,0.15)' },
+  ghost: { background: 'transparent', color: '#A09A88' },
+  danger: { background: '#dc2626', color: '#fff' },
 };
 
 const sizes = {
@@ -24,16 +24,18 @@ export function Button({
   size = 'md',
   fullWidth = false,
   className = '',
+  style,
   children,
   ...rest
 }: Props) {
   return (
     <button
       {...rest}
+      style={{ ...variants[variant], fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em', ...style }}
       className={`
         font-semibold rounded-xl transition-all duration-150 btn-press
         disabled:opacity-40 disabled:cursor-not-allowed
-        ${variants[variant]} ${sizes[size]}
+        ${sizes[size]}
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}

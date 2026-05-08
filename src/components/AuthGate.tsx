@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { User } from 'firebase/auth';
+import { Eye } from 'lucide-react';
 
 interface Props {
   user: User | null | undefined;
@@ -11,10 +12,13 @@ interface Props {
 export function AuthGate({ user, onGoogle, onAnon, children }: Props) {
   if (user === undefined) {
     return (
-      <div className="flex items-center justify-center min-h-dvh bg-bg">
+      <div className="flex items-center justify-center min-h-dvh" style={{ background: '#14141A' }}>
         <div className="flex flex-col items-center gap-4">
-          <div className="text-5xl animate-pulse-slow">🕵️</div>
-          <div className="w-8 h-8 rounded-full border-2 border-purple-light border-t-transparent animate-spin" />
+          <Eye size={36} style={{ color: '#F5D547', opacity: 0.6 }} />
+          <div
+            className="w-7 h-7 rounded-full border-2 animate-spin"
+            style={{ borderColor: 'rgba(245,213,71,0.25)', borderTopColor: '#F5D547' }}
+          />
         </div>
       </div>
     );
@@ -22,26 +26,56 @@ export function AuthGate({ user, onGoogle, onAnon, children }: Props) {
 
   if (user === null) {
     return (
-      <div className="min-h-dvh bg-hero-gradient flex flex-col">
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 safe-top">
-          <div className="animate-bounce-in mb-2">
-            <div className="text-8xl drop-shadow-2xl">🕵️</div>
+      <div className="min-h-dvh relative flex flex-col overflow-hidden" style={{ background: '#14141A' }}>
+        <div className="absolute inset-0 crt-grid pointer-events-none" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-72 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse, rgba(245,213,71,0.07) 0%, transparent 70%)' }}
+        />
+
+        <div className="relative flex-1 flex flex-col items-center justify-center px-6 py-12 safe-top gap-5">
+          <div className="relative animate-bounce-in">
+            <div
+              className="absolute inset-0 rounded-full blur-3xl pointer-events-none"
+              style={{ background: 'rgba(245,213,71,0.10)', transform: 'scale(2.8)' }}
+            />
+            <div
+              className="relative w-24 h-24 rounded-3xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(145deg, #22221A, #161610)',
+                border: '1.5px solid rgba(245,213,71,0.40)',
+                boxShadow: '0 0 32px rgba(245,213,71,0.15)',
+              }}
+            >
+              <Eye size={40} strokeWidth={1.5} style={{ color: '#F5D547' }} />
+            </div>
           </div>
-          <div className="animate-fade-in mt-4 text-center">
-            <h1 className="text-5xl font-extrabold text-white tracking-tight">Imposter</h1>
-            <p className="text-purple-pale mt-2 text-lg font-medium">The party word game</p>
-          </div>
-          <div className="mt-4 flex gap-3 animate-fade-in">
-            {['🎯', '🎲', '🃏'].map((e) => (
-              <span key={e} className="text-2xl opacity-50">{e}</span>
-            ))}
+
+          <div className="animate-fade-in text-center">
+            <h1
+              className="text-7xl text-white tracking-wide leading-none"
+              style={{ fontFamily: 'Anton, sans-serif' }}
+            >
+              IMPOSTOR
+            </h1>
+            <div
+              className="mx-auto mt-2 mb-3 rounded-full"
+              style={{ height: '2px', width: '80px', background: '#F5D547', boxShadow: '0 0 12px rgba(245,213,71,0.60)' }}
+            />
+            <p
+              className="text-sm tracking-widest uppercase"
+              style={{ color: '#A09A88', fontFamily: 'JetBrains Mono, monospace' }}
+            >
+              The Party Word Game
+            </p>
           </div>
         </div>
 
-        <div className="px-6 pb-8 safe-bottom space-y-3 animate-slide-up">
+        <div className="relative px-6 pb-8 safe-bottom space-y-3 animate-slide-up">
           <button
             onClick={onGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold py-4 px-6 rounded-2xl btn-press shadow-lg shadow-black/30 text-base"
+            className="w-full flex items-center justify-center gap-3 font-semibold py-4 px-6 rounded-2xl btn-press shadow-lg text-base"
+            style={{ background: '#F5F2E8', color: '#14141A', fontFamily: 'Inter, sans-serif' }}
           >
             <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -54,13 +88,23 @@ export function AuthGate({ user, onGoogle, onAnon, children }: Props) {
 
           <button
             onClick={onAnon}
-            className="w-full bg-surface border border-border text-white font-semibold py-4 px-6 rounded-2xl btn-press text-base"
+            className="w-full font-semibold py-4 px-6 rounded-2xl btn-press text-base"
+            style={{
+              background: '#1A1A22',
+              border: '1px solid rgba(245,213,71,0.15)',
+              color: '#A09A88',
+              fontFamily: 'JetBrains Mono, monospace',
+              letterSpacing: '0.05em',
+            }}
           >
-            Play as guest
+            PLAY AS GUEST
           </button>
 
-          <p className="text-center text-gray-500 text-xs px-4">
-            Sign in with Google to save stats and create custom categories
+          <p
+            className="text-center text-xs px-4"
+            style={{ color: '#5C5848', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.03em' }}
+          >
+            SIGN IN TO SAVE STATS AND CUSTOM CATEGORIES
           </p>
         </div>
       </div>
