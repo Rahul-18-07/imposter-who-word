@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   imposterSeesCategory: true,
   imposterSeesHint: true,
   impostersSeeEachOther: false,
+  categoryIds: [],
   categoryId: '',
   categoryName: '',
 };

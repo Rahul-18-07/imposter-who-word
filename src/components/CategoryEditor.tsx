@@ -22,9 +22,10 @@ export function CategoryEditor({ initial, onSave, onCancel }: Props) {
 
   const addEntry = () => {
     const word = newWord.trim();
-    if (!word) return;
+    const hint = newHint.trim();
+    if (!word || !hint) return;
     if (entries.some((e) => e.word.toLowerCase() === word.toLowerCase())) return;
-    setEntries([...entries, { word, hint: newHint.trim() }]);
+    setEntries([...entries, { word, hint }]);
     setNewWord('');
     setNewHint('');
   };
@@ -33,7 +34,7 @@ export function CategoryEditor({ initial, onSave, onCancel }: Props) {
 
   const handleSave = async () => {
     if (!name.trim()) { setError('Category name is required.'); return; }
-    if (entries.length < 5) { setError('Add at least 5 words.'); return; }
+    if (entries.length < 1) { setError('Add at least 1 word.'); return; }
     if (entries.length > 50) { setError('Maximum 50 words allowed.'); return; }
     setError('');
     setSaving(true);
@@ -75,25 +76,25 @@ export function CategoryEditor({ initial, onSave, onCancel }: Props) {
 
       <div className="space-y-2">
         <label className="block text-sm text-gray-400">
-          Words ({entries.length}/50, min 5)
+          Words ({entries.length}/50) — both word and hint required
         </label>
 
         <div className="flex gap-2">
           <Input
-            placeholder="Word (e.g., Biryani)"
+            placeholder="Word *"
             value={newWord}
             onChange={(e) => setNewWord(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addEntry()}
             className="flex-1"
           />
           <Input
-            placeholder="Hint (e.g., Rice)"
+            placeholder="Hint *"
             value={newHint}
             onChange={(e) => setNewHint(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addEntry()}
             className="flex-1"
           />
-          <Button onClick={addEntry} disabled={!newWord.trim()} className="px-4">
+          <Button onClick={addEntry} disabled={!newWord.trim() || !newHint.trim()} className="px-4">
             Add
           </Button>
         </div>

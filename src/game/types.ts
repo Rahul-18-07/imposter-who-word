@@ -35,7 +35,8 @@ export interface GameSettings {
   imposterSeesCategory: boolean;
   imposterSeesHint: boolean;
   impostersSeeEachOther: boolean;
-  categoryId: string;
+  categoryIds: string[];  // selected pool; game picks one randomly at start
+  categoryId: string;     // the one actually used for the current game
   categoryName: string;
 }
 

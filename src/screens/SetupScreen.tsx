@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from 'firebase/auth';
 import type { GameState, GameAction } from '../game/types';
@@ -6,6 +7,8 @@ import { CategoryPicker } from '../components/CategoryPicker';
 import { Toggle } from '../components/ui/Toggle';
 import { useCategories } from '../hooks/useCategories';
 import { deal } from '../game/dealer';
+
+const PLAYERS_KEY = 'imposter_saved_players';
 
 interface Props {
   state: GameState;
@@ -18,21 +21,41 @@ export function SetupScreen({ state, dispatch, user }: Props) {
   const { official, custom, loading } = useCategories(user);
   const { players, settings } = state;
 
+  // Load saved players from localStorage on first mount (only if list is empty)
+  useEffect(() => {
+    if (players.length === 0) {
+      try {
+        const saved = localStorage.getItem(PLAYERS_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            dispatch({ type: 'SET_PLAYERS', players: parsed });
+          }
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Persist players to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+    } catch {}
+  }, [players]);
+
   const maxImposters = Math.max(1, Math.floor((players.length - 1) / 2));
 
   const canStart =
     players.length >= 3 &&
-    (settings.categoryId === '__random__' || settings.categoryId !== '');
+    settings.categoryIds.length > 0;
 
   const startGame = () => {
-    let selectedCategory =
-      official.find((c) => c.id === settings.categoryId) ||
-      custom.find((c) => c.id === settings.categoryId);
+    const all = [...official, ...custom];
+    const pool = settings.categoryIds.length > 0
+      ? all.filter((c) => settings.categoryIds.includes(c.id))
+      : all;
 
-    if (settings.categoryId === '__random__' || !selectedCategory) {
-      const all = [...official, ...custom];
-      selectedCategory = all[Math.floor(Math.random() * all.length)];
-    }
+    const selectedCategory = pool[Math.floor(Math.random() * pool.length)];
 
     if (!selectedCategory) return;
 
@@ -106,10 +129,17 @@ export function SetupScreen({ state, dispatch, user }: Props) {
             <CategoryPicker
               official={official}
               custom={custom}
-              selected={settings.categoryId}
+              selectedIds={settings.categoryIds}
               user={user}
-              onSelect={(id, name) =>
-                dispatch({ type: 'SET_SETTINGS', settings: { categoryId: id, categoryName: name } })
+              onToggle={(id) =>
+                dispatch({
+                  type: 'SET_SETTINGS',
+                  settings: {
+                    categoryIds: settings.categoryIds.includes(id)
+                      ? settings.categoryIds.filter((x) => x !== id)
+                      : [...settings.categoryIds, id],
+                  },
+                })
               }
             />
           )}
@@ -195,7 +225,7 @@ export function SetupScreen({ state, dispatch, user }: Props) {
           {!canStart
             ? players.length < 3
               ? '👥 Add at least 3 players'
-              : '🗂️ Pick a category'
+              : '🗂️ Pick at least 1 category'
             : `🎮 Start Game · ${players.length} players`}
         </button>
       </div>
