@@ -1,6 +1,8 @@
 import type { GameState, GameAction, GameSettings } from './types';
 import { checkWinCondition } from './selectors';
 
+const SETTINGS_KEY = 'imposter_settings';
+
 const DEFAULT_SETTINGS: GameSettings = {
   imposterCount: 1,
   imposterSeesCategory: true,
@@ -10,6 +12,46 @@ const DEFAULT_SETTINGS: GameSettings = {
   categoryId: '',
   categoryName: '',
 };
+
+function loadSettings(): GameSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    const saved = JSON.parse(raw);
+    return {
+      ...DEFAULT_SETTINGS,
+      imposterCount: typeof saved.imposterCount === 'number' ? saved.imposterCount : DEFAULT_SETTINGS.imposterCount,
+      imposterSeesCategory: typeof saved.imposterSeesCategory === 'boolean' ? saved.imposterSeesCategory : DEFAULT_SETTINGS.imposterSeesCategory,
+      imposterSeesHint: typeof saved.imposterSeesHint === 'boolean' ? saved.imposterSeesHint : DEFAULT_SETTINGS.imposterSeesHint,
+      impostersSeeEachOther: typeof saved.impostersSeeEachOther === 'boolean' ? saved.impostersSeeEachOther : DEFAULT_SETTINGS.impostersSeeEachOther,
+      categoryIds: Array.isArray(saved.categoryIds) ? saved.categoryIds : DEFAULT_SETTINGS.categoryIds,
+    };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export function saveSettings(settings: GameSettings): void {
+  try {
+    const { imposterCount, imposterSeesCategory, imposterSeesHint, impostersSeeEachOther, categoryIds } = settings;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ imposterCount, imposterSeesCategory, imposterSeesHint, impostersSeeEachOther, categoryIds }));
+  } catch {}
+}
+
+export function makeInitialState(): GameState {
+  return {
+    phase: 'setup',
+    players: [],
+    settings: loadSettings(),
+    roles: [],
+    secretWord: '',
+    secretHint: '',
+    revealIndex: 0,
+    pendingElimination: null,
+    eliminations: [],
+    result: null,
+  };
+}
 
 export const INITIAL_STATE: GameState = {
   phase: 'setup',

@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { gameReducer, INITIAL_STATE } from './game/reducer';
+import { gameReducer, makeInitialState } from './game/reducer';
 import { AuthGate } from './components/AuthGate';
 import { HomeScreen } from './screens/HomeScreen';
 import { SetupScreen } from './screens/SetupScreen';
@@ -11,7 +11,7 @@ import { CategoriesScreen } from './screens/CategoriesScreen';
 
 function App() {
   const { user, signInWithGoogle, signInAnonymously } = useAuth();
-  const [gameState, dispatch] = useReducer(gameReducer, INITIAL_STATE);
+  const [gameState, dispatch] = useReducer(gameReducer, undefined, makeInitialState);
 
   return (
     <AuthGate user={user} onGoogle={signInWithGoogle} onAnon={signInAnonymously}>

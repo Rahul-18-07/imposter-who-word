@@ -7,6 +7,7 @@ import { CategoryPicker } from '../components/CategoryPicker';
 import { Toggle } from '../components/ui/Toggle';
 import { useCategories } from '../hooks/useCategories';
 import { deal } from '../game/dealer';
+import { saveSettings } from '../game/reducer';
 import { ArrowLeft, Play, Minus, Plus } from 'lucide-react';
 
 const PLAYERS_KEY = 'imposter_saved_players';
@@ -53,6 +54,10 @@ export function SetupScreen({ state, dispatch, user }: Props) {
   useEffect(() => {
     try { localStorage.setItem(PLAYERS_KEY, JSON.stringify(players)); } catch {}
   }, [players]);
+
+  useEffect(() => {
+    saveSettings(settings);
+  }, [settings]);
 
   const maxImposters = Math.max(1, Math.floor((players.length - 1) / 2));
   const canStart = players.length >= 3 && settings.categoryIds.length > 0;
