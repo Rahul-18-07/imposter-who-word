@@ -7,7 +7,7 @@ import { CategoryPicker } from '../components/CategoryPicker';
 import { Toggle } from '../components/ui/Toggle';
 import { useCategories } from '../hooks/useCategories';
 import { deal } from '../game/dealer';
-import { saveSettings } from '../game/reducer';
+import { saveSettings, getWeightsForPlayers } from '../game/reducer';
 import { ArrowLeft, Play, Minus, Plus } from 'lucide-react';
 
 const PLAYERS_KEY = 'imposter_saved_players';
@@ -70,13 +70,15 @@ export function SetupScreen({ state, dispatch, user }: Props) {
     const selectedCategory = pool[Math.floor(Math.random() * pool.length)];
     if (!selectedCategory) return;
     const clampedCount = Math.min(settings.imposterCount, maxImposters);
+    const playerNames = players.map((p) => p.name);
     const result = deal(
-      players.map((p) => p.name),
+      playerNames,
       selectedCategory,
       clampedCount,
       settings.imposterSeesCategory,
       settings.imposterSeesHint,
       settings.impostersSeeEachOther,
+      getWeightsForPlayers(state.imposterWeights, playerNames),
     );
     dispatch({ type: 'SET_SETTINGS', settings: { categoryId: selectedCategory.id, categoryName: selectedCategory.name, imposterCount: clampedCount } });
     dispatch({ type: 'START_GAME', roles: result.roles, secretWord: result.secretWord, secretHint: result.secretHint });
