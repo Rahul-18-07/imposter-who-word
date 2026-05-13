@@ -64,6 +64,10 @@ export interface GameState {
   pendingElimination: number | null; // playerIndex being eliminated
   eliminations: Elimination[];
   result: 'civilians' | 'imposters' | null;
+  // Per-player impostor selection weights, keyed by player name. Lower weight =
+  // less likely to be picked. Decays after being impostor, recovers otherwise.
+  // Persisted across sessions so fairness carries across days.
+  imposterWeights: Record<string, number>;
 }
 
 export type GameAction =
