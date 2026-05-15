@@ -1,10 +1,11 @@
 import type { GameState } from '../game/types';
-import { Trophy, Skull, UserX, Gamepad2, Home } from 'lucide-react';
+import { Trophy, Skull, UserX, RotateCcw, Home } from 'lucide-react';
 
 interface Props {
   state: GameState;
-  onPlayAgain: () => void;
+  onReplay: () => void;
   onHome: () => void;
+  canReplay: boolean;
 }
 
 const S = {
@@ -20,7 +21,7 @@ const S = {
   anton: 'Anton, sans-serif' as const,
 };
 
-export function GameOverScreen({ state, onPlayAgain, onHome }: Props) {
+export function GameOverScreen({ state, onReplay, onHome, canReplay }: Props) {
   const civilianWon = state.result === 'civilians';
 
   const imposters = state.players.filter(
@@ -84,18 +85,19 @@ export function GameOverScreen({ state, onPlayAgain, onHome }: Props) {
 
       <div className="w-full max-w-sm space-y-3 mt-5">
         <button
-          onClick={onPlayAgain}
-          className="w-full py-4 px-6 rounded-2xl btn-press flex items-center justify-center gap-2"
-          style={{ background: S.lemon, color: '#14141A', boxShadow: '0 4px 0 #C9AB22', fontFamily: S.anton, letterSpacing: '0.06em', fontSize: '18px' }}
+          onClick={onReplay}
+          disabled={!canReplay}
+          className="w-full py-4 px-6 rounded-2xl btn-press flex items-center justify-center gap-2 disabled:opacity-40"
+          style={{ background: S.lemon, color: '#14141A', boxShadow: canReplay ? '0 4px 0 #C9AB22' : 'none', fontFamily: S.anton, letterSpacing: '0.06em', fontSize: '18px' }}
         >
-          <Gamepad2 size={20} /> PLAY AGAIN
+          <RotateCcw size={20} /> REPLAY
         </button>
         <button
           onClick={onHome}
           className="w-full py-4 px-6 rounded-2xl btn-press flex items-center justify-center gap-2"
           style={{ background: S.surface, border: `1px solid ${S.border}`, color: S.dim, fontFamily: S.mono, fontSize: '13px', letterSpacing: '0.04em' }}
         >
-          <Home size={16} /> HOME
+          <Home size={16} /> BACK
         </button>
       </div>
     </div>

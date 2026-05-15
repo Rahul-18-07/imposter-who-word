@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "npx tsx src/lib/seedCategories.ts"
+    "seed": "npx tsx src/lib/seedCategories.ts",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
   },
   "dependencies": {
     "firebase": "^12.12.1",
