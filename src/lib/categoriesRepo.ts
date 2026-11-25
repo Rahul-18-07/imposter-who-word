@@ -9,10 +9,17 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, OFFLINE } from './firebase';
+import { SEED_CATEGORIES } from '../game/seed-data';
 import type { Category, CategoryEntry } from '../game/types';
 
 export async function listOfficialCategories(): Promise<Category[]> {
+  if (OFFLINE) {
+    // Offline mode: serve the bundled seed categories instead of Firestore.
+    return SEED_CATEGORIES
+      .map((c, i) => ({ ...c, id: `seed_${i}` }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
   const snap = await getDocs(
     query(collection(db, 'categories'), orderBy('name')),
   );
