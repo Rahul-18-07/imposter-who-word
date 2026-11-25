@@ -1,35 +1,27 @@
 import type { Category, PlayerRole } from './types';
 
+// Uniform random integer in [0, max) from the crypto RNG. Rejection sampling
+// avoids modulo bias, so every value is exactly equally likely.
 function cryptoRandInt(max: number): number {
+  const limit = Math.floor(0x100000000 / max) * max;
   const arr = new Uint32Array(1);
-  crypto.getRandomValues(arr);
+  do {
+    crypto.getRandomValues(arr);
+  } while (arr[0] >= limit);
   return arr[0] % max;
 }
 
-function cryptoRandFloat(): number {
-  const arr = new Uint32Array(1);
-  crypto.getRandomValues(arr);
-  return arr[0] / 0x100000000;
-}
-
-// Weighted sampling without replacement. Returns `count` distinct indices,
-// drawn proportional to weights[i]. Players with weight 0 are still eligible
-// at a tiny minimum so they can never be permanently excluded.
-function weightedPickIndices(weights: number[], count: number): number[] {
-  const picked: number[] = [];
-  const pool = weights.map((w, i) => ({ i, w: Math.max(w, 1e-6) }));
-  for (let k = 0; k < count && pool.length > 0; k++) {
-    const total = pool.reduce((s, p) => s + p.w, 0);
-    let r = cryptoRandFloat() * total;
-    let chosenIdx = pool.length - 1;
-    for (let j = 0; j < pool.length; j++) {
-      r -= pool[j].w;
-      if (r <= 0) { chosenIdx = j; break; }
-    }
-    picked.push(pool[chosenIdx].i);
-    pool.splice(chosenIdx, 1);
+// Pure random pick: `count` distinct player indices out of `n`, every player
+// equally likely every round. No memory of previous rounds, so the same person
+// can be imposter again (partial Fisher-Yates shuffle).
+export function randomPickIndices(n: number, count: number): number[] {
+  const idx = Array.from({ length: n }, (_, i) => i);
+  const k = Math.min(count, n);
+  for (let i = 0; i < k; i++) {
+    const j = i + cryptoRandInt(n - i);
+    [idx[i], idx[j]] = [idx[j], idx[i]];
   }
-  return picked;
+  return idx.slice(0, k);
 }
 
 export interface DealResult {
@@ -45,7 +37,6 @@ export function deal(
   imposterSeesCategory: boolean,
   imposterSeesHint: boolean,
   impostersSeeEachOther: boolean,
-  playerWeights: number[],
 ): DealResult {
   const entryIndex = cryptoRandInt(category.entries.length);
   const entry = category.entries[entryIndex];
@@ -57,8 +48,8 @@ export function deal(
     '';
   const effectiveHint = entry.hint || fallbackHint;
 
-  // Pick imposter indices via weighted sampling without replacement.
-  const imposterIndices = new Set(weightedPickIndices(playerWeights, imposterCount));
+  // Pick imposters uniformly at random among all players.
+  const imposterIndices = new Set(randomPickIndices(playerNames.length, imposterCount));
   const imposterNames = [...imposterIndices].map((i) => playerNames[i]);
 
   const roles: PlayerRole[] = playerNames.map((_, i) => {

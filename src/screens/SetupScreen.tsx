@@ -7,7 +7,7 @@ import { CategoryPicker } from '../components/CategoryPicker';
 import { Toggle } from '../components/ui/Toggle';
 import { useCategories } from '../hooks/useCategories';
 import { deal } from '../game/dealer';
-import { saveSettings, getWeightsForPlayers } from '../game/reducer';
+import { saveSettings } from '../game/reducer';
 import { ArrowLeft, Play, Minus, Plus } from 'lucide-react';
 
 const PLAYERS_KEY = 'imposter_saved_players';
@@ -78,7 +78,6 @@ export function SetupScreen({ state, dispatch, user }: Props) {
       settings.imposterSeesCategory,
       settings.imposterSeesHint,
       settings.impostersSeeEachOther,
-      getWeightsForPlayers(state.imposterWeights, playerNames),
     );
     dispatch({ type: 'SET_SETTINGS', settings: { categoryId: selectedCategory.id, categoryName: selectedCategory.name, imposterCount: clampedCount } });
     dispatch({ type: 'START_GAME', roles: result.roles, secretWord: result.secretWord, secretHint: result.secretHint });
