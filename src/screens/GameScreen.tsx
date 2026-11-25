@@ -10,7 +10,6 @@ import { UserX, User as UserIcon, ArrowRight, AlertTriangle } from 'lucide-react
 import { StartingPlayerPicker } from '../components/StartingPlayerPicker';
 import { useCategories } from '../hooks/useCategories';
 import { deal } from '../game/dealer';
-import { getWeightsForPlayers } from '../game/reducer';
 
 interface Props {
   state: GameState;
@@ -59,7 +58,6 @@ export function GameScreen({ state, dispatch, user }: Props) {
       state.settings.imposterSeesCategory,
       state.settings.imposterSeesHint,
       state.settings.impostersSeeEachOther,
-      getWeightsForPlayers(state.imposterWeights, playerNames),
     );
     dispatch({ type: 'SET_SETTINGS', settings: { categoryId: selectedCategory.id, categoryName: selectedCategory.name, imposterCount: clampedCount } });
     dispatch({ type: 'START_GAME', roles: result.roles, secretWord: result.secretWord, secretHint: result.secretHint });
